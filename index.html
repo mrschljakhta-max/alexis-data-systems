@@ -1,323 +1,690 @@
 <!doctype html>
 <html lang="uk" data-theme="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Alexis Data Systems — Excel & Automation</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <title>Alexis Data Systems — Excel & Google Sheets Automation</title>
+  <meta name="description" content="Clean business systems built on Excel & Google Sheets. Dashboards, automation, tracking, onboarding." />
 
-<style>
-/* =========================
-   CORE TOKENS
-========================= */
-:root{
-  --bg:#070A14;
-  --bg2:#0B1022;
-  --glass:rgba(255,255,255,.06);
-  --stroke:rgba(255,255,255,.12);
-  --text:#EAF0FF;
-  --muted:#9AA7D6;
-  --accent:#4F7DFF;
-  --accent2:#2BD2FF;
-  --radius:18px;
-  --headerH:82px;
-}
+  <style>
+    /* =========================
+       THEME TOKENS
+    ========================== */
+    :root{
+      --bg0:#070A14;
+      --bg1:#0B1022;
+      --glass: rgba(255,255,255,.06);
+      --glass2: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.16);
+      --text:#EAF0FF;
+      --muted:#B9C4E6;
+      --muted2:#8E9AC3;
+      --accent:#4F7DFF;
+      --accent2:#2BD2FF;
+      --good:#33D69F;
+      --warn:#FFCF5A;
+      --shadow: 0 18px 55px rgba(0,0,0,.45);
+      --shadow2: 0 10px 25px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius2: 22px;
+      --headerH: 80px;
+      --max: 1120px;
+      --fadeDur: .6s;
+    }
+    html[data-theme="light"]{
+      --bg0:#F7F8FC;
+      --bg1:#EEF1FB;
+      --glass: rgba(10,20,40,.06);
+      --glass2: rgba(10,20,40,.08);
+      --stroke: rgba(10,20,40,.10);
+      --stroke2: rgba(10,20,40,.16);
+      --text:#0E1633;
+      --muted:#2C3B6B;
+      --muted2:#55679E;
+      --shadow: 0 18px 55px rgba(15,25,55,.14);
+      --shadow2: 0 10px 25px rgba(15,25,55,.12);
+    }
 
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  color:var(--text);
-  background:
-    radial-gradient(900px 500px at 15% 0%, rgba(79,125,255,.25), transparent 60%),
-    radial-gradient(900px 600px at 85% 10%, rgba(43,210,255,.18), transparent 62%),
-    linear-gradient(180deg,var(--bg),var(--bg2));
-}
+    /* Base */
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font: 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans";
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 15% -10%, rgba(79,125,255,.22), transparent 60%),
+        radial-gradient(900px 600px at 85% 0%, rgba(43,210,255,.16), transparent 62%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height:100svh;
+    }
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding:0 18px;}
+    .sr{position:absolute; left:-9999px;}
 
-a{color:inherit;text-decoration:none}
-.wrap{max-width:1200px;margin:auto;padding:0 20px}
+    /* =========================
+       HEADER (STICKY)
+    ========================== */
+    .header{
+      position:sticky; top:0; z-index:50;
+      height:var(--headerH);
+      backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.12));
+      border-bottom:1px solid var(--glass2);
+    }
+    html[data-theme="light"] .header{
+      background: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.55));
+      border-bottom:1px solid var(--stroke);
+    }
+    .headRow{height:100%; display:flex; align-items:center; justify-content:space-between; gap:14px;}
 
-/* =========================
-   HEADER
-========================= */
-header{
-  position:sticky;top:0;z-index:100;
-  height:var(--headerH);
-  backdrop-filter:blur(14px);
-  background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.25));
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-.header-inner{
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-}
+    /* Brand */
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      padding:10px 8px; border-radius:12px; transition:background .2s ease, transform .2s ease;
+    }
+    .brand:hover{transform:translateY(-1px); background:var(--glass);}
+    .logoBox{
+      width:56px; height:56px; border-radius:14px; display:grid; place-items:center;
+      box-shadow: var(--shadow2);
+      background: radial-gradient(130% 130% at 20% 20%, rgba(79,125,255,.18), rgba(43,210,255,.10));
+      border:1px solid var(--stroke2);
+      overflow:hidden;
+    }
+    .logoBox img{width:34px; height:34px; display:block; filter:drop-shadow(0 8px 18px rgba(0,0,0,.25))}
+    .brandTxt{line-height:1.1}
+    .brandTxt b{display:block; font-size:18px; letter-spacing:.2px}
+    .brandTxt span{display:block; color:var(--muted2); font-size:12px}
 
-/* LOGO */
-.brand{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-.brand img{
-  height:52px;
-  width:auto;
-}
-.brandText b{
-  font-size:18px;
-  display:block;
-}
-.brandText span{
-  font-size:13px;
-  color:var(--muted);
-}
+    /* Nav */
+    .nav{display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:center}
+    .nav a{
+      position:relative; padding:10px 14px; border-radius:999px;
+      color:var(--muted); font-weight:600;
+      transition:color .2s ease, background .2s ease;
+    }
+    .nav a:hover{color:var(--text); background:var(--glass)}
+    .nav a.active{color:var(--text); background:linear-gradient(90deg, rgba(79,125,255,.25), rgba(43,210,255,.18)); border:1px solid var(--stroke2)}
+    @media (max-width:980px){ .nav{display:none} }
 
-/* NAV */
-nav{
-  display:flex;
-  gap:10px;
-}
-nav a{
-  padding:10px 14px;
-  border-radius:999px;
-  color:var(--muted);
-  transition:.25s;
-}
-nav a:hover{
-  color:#fff;
-  background:rgba(255,255,255,.08);
-}
+    /* Right cluster */
+    .hdrRight{display:flex; align-items:center; gap:10px}
 
-/* RIGHT */
-.hdrRight{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
+    /* Avatar card (no layout shift) */
+    .avatarCard{
+      --w: 260px; /* reserved width */
+      width:var(--w); height:52px; border-radius:999px; border:1px solid var(--stroke);
+      background:var(--glass); box-shadow:var(--shadow2);
+      display:grid; grid-template-columns:48px 1fr; align-items:center; padding:4px 8px 4px 4px; overflow:hidden;
+    }
+    .avatar{width:44px; height:44px; border-radius:14px; overflow:hidden; display:grid; place-items:center; border:1px solid var(--stroke2); background:var(--glass2)}
+    .avatar img{width:100%; height:100%; object-fit:cover; display:block}
+    .ameta{min-width:0}
+    .ameta b{display:block; font-size:14px; line-height:1.1}
+    .ameta span{display:block; color:var(--muted2); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .avatarCard:hover{background:var(--glass2); border-color:var(--stroke2)}
 
-/* AVATAR (no layout shift) */
-.avatarWrap{
-  position:relative;
-  width:44px;
-  height:44px;
-}
-.avatarWrap img{
-  width:44px;
-  height:44px;
-  border-radius:50%;
-  object-fit:cover;
-  border:1px solid rgba(255,255,255,.2);
-}
+    /* Theme & CTA */
+    .iconBtn{
+      width:52px; height:52px; border-radius:16px; border:1px solid var(--stroke2);
+      background:var(--glass); display:grid; place-items:center; cursor:pointer;
+      transition:transform .18s ease, background .2s ease, border-color .2s ease;
+    }
+    .iconBtn:hover{transform:translateY(-1px); background:var(--glass2); border-color:var(--stroke2)}
+    .cta{
+      padding:14px 18px; border-radius:999px; border:0; cursor:pointer; color:#061023;
+      background:linear-gradient(90deg, rgba(79,125,255,.95), rgba(43,210,255,.92));
+      box-shadow:0 12px 28px rgba(79,125,255,.25); font-weight:800; letter-spacing:.2px; position:relative; overflow:hidden;
+      transition:transform .14s ease, filter .2s ease;
+    }
+    .cta:hover{transform:translateY(-1px); filter:brightness(1.04)}
+    .cta:active{transform:translateY(0)}
+    .cta:focus-visible{outline:2px solid var(--accent2); outline-offset:2px}
 
-/* CTA */
-.cta{
-  padding:12px 18px;
-  border-radius:999px;
-  background:linear-gradient(90deg,var(--accent),var(--accent2));
-  color:#061023;
-  font-weight:800;
-  transition:transform .2s,box-shadow .2s;
-}
-.cta:hover{
-  transform:translateY(-2px);
-  box-shadow:0 12px 28px rgba(79,125,255,.35);
-}
+    /* Ripple effect (buttons) */
+    .ripple{position:absolute; inset:0; pointer-events:none; overflow:hidden; border-radius:inherit}
+    .ripple i{
+      position:absolute; width:12px; height:12px; border-radius:999px; background:rgba(255,255,255,.6); transform:translate(-50%,-50%) scale(0);
+      animation:r .7s ease-out; opacity:.7;
+    }
+    @keyframes r{
+      to{transform:translate(-50%,-50%) scale(22); opacity:0}
+    }
 
-/* =========================
-   HERO
-========================= */
-.hero{
-  padding:80px 0 40px;
-}
-.heroGrid{
-  display:grid;
-  grid-template-columns:1.2fr .8fr;
-  gap:28px;
-}
-h1{
-  font-size:52px;
-  line-height:1.05;
-  margin:0 0 14px;
-}
-.lead{
-  font-size:18px;
-  color:var(--muted);
-  max-width:60ch;
-}
+    /* Sections */
+    section{scroll-margin-top:calc(var(--headerH) + 18px)}
+    .section{padding: 40px 0}
+    .secTitle{display:flex; align-items:flex-end; justify-content:space-between; gap:14px; margin-bottom:14px}
+    .secTitle h2{margin:0; font-size:28px; letter-spacing:-.5px}
+    .secTitle p{margin:0; color:var(--muted); max-width:70ch}
+    .panel{border-radius:var(--radius2); border:1px solid var(--stroke); background:var(--glass); box-shadow:var(--shadow); overflow:hidden}
 
-/* BUTTONS */
-.btns{
-  margin-top:22px;
-  display:flex;
-  gap:12px;
-}
-.btn{
-  padding:14px 18px;
-  border-radius:14px;
-  background:var(--glass);
-  border:1px solid var(--stroke);
-  font-weight:700;
-  transition:.25s;
-}
-.btn:hover{
-  transform:translateY(-2px);
-  background:rgba(255,255,255,.1);
-}
+    /* Hero */
+    .hero{padding:50px 0 24px}
+    .heroGrid{display:grid; grid-template-columns:1.15fr .95fr; gap:18px}
+    @media (max-width:980px){ .heroGrid{grid-template-columns:1fr} }
+    .heroL{padding:26px}
+    .pill{display:inline-flex; gap:8px; align-items:center; padding:8px 12px; border-radius:999px; background:var(--glass); border:1px solid var(--stroke); color:var(--muted); font-size:13px}
+    h1{margin:16px 0 12px; font-size:52px; line-height:1.05; letter-spacing:-1.2px}
+    @media (max-width:560px){ h1{font-size:40px} }
+    .lead{color:var(--muted); font-size:17px; max-width:62ch}
+    .badges{display:flex; flex-wrap:wrap; gap:10px; margin:16px 0}
+    .badge{display:inline-flex; align-items:center; gap:10px; padding:10px 12px; border-radius:999px; background:var(--glass); border:1px solid var(--stroke); color:var(--muted); font-weight:600; font-size:13px}
+    .tick{width:18px; height:18px; border-radius:6px; display:grid; place-items:center; background:rgba(51,214,159,.16); border:1px solid rgba(51,214,159,.35); color:var(--good); font-weight:900; font-size:12px}
+    .heroBtns{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+    .btn{padding:12px 14px; border-radius:14px; border:1px solid var(--stroke); background:var(--glass); color:var(--text); cursor:pointer; font-weight:700; transition:transform .14s ease, background .2s ease, border-color .2s ease; position:relative; overflow:hidden}
+    .btn:hover{transform:translateY(-1px); background:var(--glass2); border-color:var(--stroke2)}
+    .btn:active{transform:translateY(0)}
+    .btn:focus-visible{outline:2px solid var(--accent2); outline-offset:2px}
 
-/* =========================
-   CAROUSEL
-========================= */
-.carousel{
-  position:relative;
-  overflow:hidden;
-  border-radius:24px;
-  border:1px solid var(--stroke);
-  background:rgba(255,255,255,.04);
-}
-.track{
-  display:flex;
-  transition:transform .5s ease;
-}
-.slide{
-  min-width:100%;
-  position:relative;
-}
-.slide img{
-  width:100%;
-  display:block;
-}
-.tag{
-  position:absolute;
-  top:14px;
-  left:14px;
-  padding:6px 12px;
-  border-radius:999px;
-  background:rgba(0,0,0,.5);
-  font-size:13px;
-}
+    .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:14px; border-top:1px solid var(--stroke); background:rgba(0,0,0,.10)}
+    html[data-theme="light"] .stats{background:rgba(255,255,255,.55)}
+    .stat{padding:14px; border-radius:16px; border:1px solid var(--stroke); background:var(--glass)}
+    .stat b{display:block; font-size:24px}
+    .stat span{color:var(--muted); font-size:13px}
 
-/* =========================
-   SECTIONS
-========================= */
-section{padding:70px 0}
-h2{font-size:32px;margin:0 0 14px}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-}
-.card{
-  padding:18px;
-  border-radius:18px;
-  background:var(--glass);
-  border:1px solid var(--stroke);
-}
-.card h3{margin:0 0 6px}
+    .heroR{padding:14px}
+    .preview{border-radius:22px; border:1px solid var(--stroke); background:radial-gradient(800px 420px at 20% 10%, rgba(79,125,255,.22), transparent 55%), radial-gradient(700px 420px at 80% 20%, rgba(43,210,255,.16), transparent 55%), var(--glass); box-shadow:var(--shadow)}
+    .pTop{padding:12px 14px; display:flex; align-items:center; justify-content:space-between}
+    .miniDots{display:flex; gap:6px}.dot{width:9px;height:9px;border-radius:99px;background:rgba(255,255,255,.18)} html[data-theme="light"] .dot{background:rgba(10,20,40,.18)}
 
-/* =========================
-   FOOTER
-========================= */
-footer{
-  padding:40px 0;
-  color:var(--muted);
-  font-size:13px;
-  text-align:center;
-}
+    /* Carousel */
+    .carousel{position:relative; padding:12px 12px 18px}
+    .track{display:grid; grid-auto-flow:column; gap:12px; overflow:hidden; scroll-behavior:smooth}
+    .slide{width:100%; max-width:520px; aspect-ratio:16/10; border-radius:16px; border:1px solid var(--stroke); background:var(--glass); color:var(--muted2); font-weight:700; letter-spacing:.2px; position:relative; overflow:hidden}
+    .slide img{width:100%; height:100%; object-fit:cover; display:block}
+    .tag{position:absolute; left:10px; top:10px; font-size:12px; padding:6px 10px; border-radius:999px; background:rgba(0,0,0,.35); border:1px solid var(--stroke2); backdrop-filter:blur(10px); color:#fff}
+    html[data-theme="light"] .tag{background:rgba(255,255,255,.7); color:var(--text)}
+    .ctrl{position:absolute; inset:0; pointer-events:none}
+    .ctrl button{pointer-events:auto; position:absolute; top:calc(50% - 22px); width:44px; height:44px; border-radius:12px; border:1px solid var(--stroke); background:var(--glass); display:grid; place-items:center; cursor:pointer}
+    .ctrl .prev{left:8px}.ctrl .next{right:8px}
+    .ctrl button:hover{background:var(--glass2); border-color:var(--stroke2)}
+    .dots{display:flex; gap:8px; justify-content:center; padding-top:10px}
+    .dots b{width:8px;height:8px;border-radius:99px; background:var(--stroke2); opacity:.6}
+    .dots b.on{opacity:1; background:linear-gradient(90deg,var(--accent),var(--accent2))}
 
-/* =========================
-   MOBILE
-========================= */
-@media(max-width:900px){
-  nav{display:none}
-  .heroGrid{grid-template-columns:1fr}
-  h1{font-size:40px}
-}
-</style>
+    /* Cards & grids */
+    .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+    @media (max-width:980px){ .grid3{grid-template-columns:1fr} }
+    .card{border-radius:var(--radius); border:1px solid var(--stroke); background:var(--glass); padding:16px; box-shadow:var(--shadow2)}
+    .card h3{margin:0 0 6px; font-size:16px}
+    .card p{margin:0; color:var(--muted); font-size:14px}
+    .ico{width:36px;height:36px;border-radius:14px;background:linear-gradient(135deg, rgba(79,125,255,.35), rgba(43,210,255,.22)); border:1px solid var(--stroke2); display:grid; place-items:center; margin-bottom:10px}
+
+    /* Cases two-columns */
+    .cases{display:grid; grid-template-columns:repeat(2,1fr); gap:12px}
+    @media (max-width:980px){ .cases{grid-template-columns:1fr} }
+    .case{border-radius:var(--radius2); border:1px solid var(--stroke); background:linear-gradient(180deg,var(--glass), rgba(255,255,255,.03)); padding:14px; box-shadow:var(--shadow2); overflow:hidden}
+    .caseTop{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px}
+    .chips{display:flex; flex-wrap:wrap; gap:8px}
+    .chip{font-size:12px; padding:6px 10px; border-radius:999px; background:var(--glass); border:1px solid var(--stroke); color:var(--muted); font-weight:650}
+    .shot{border-radius:18px; border:1px solid var(--stroke); background:rgba(255,255,255,.03); overflow:hidden; aspect-ratio:16/9; display:grid; place-items:center}
+    .shot img{width:100%; height:100%; object-fit:cover; display:block}
+    .caseActions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+    .linkBtn{padding:10px 12px; border-radius:14px; border:1px solid var(--stroke); background:var(--glass); color:var(--text); font-weight:750; display:inline-flex; align-items:center; gap:8px; position:relative; overflow:hidden; cursor:pointer}
+    .linkBtn:hover{background:var(--glass2); border-color:var(--stroke2)}
+
+    /* Demo mock */
+    .demoGrid{display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:start}
+    @media (max-width:980px){ .demoGrid{grid-template-columns:1fr} }
+    .selectRow{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:10px}
+    @media (max-width:680px){ .selectRow{grid-template-columns:1fr} }
+    select{width:100%; padding:12px 12px; border-radius:14px; border:1px solid var(--stroke2); background:var(--glass); color:var(--text); outline:none}
+    .result{padding:16px; border-radius:var(--radius2); border:1px solid var(--stroke); background:radial-gradient(700px 380px at 30% 10%, rgba(79,125,255,.22), transparent 55%), radial-gradient(700px 380px at 75% 20%, rgba(43,210,255,.16), transparent 58%), var(--glass); box-shadow:var(--shadow2)}
+    .mock{margin-top:12px; border-radius:18px; border:1px solid var(--stroke); background:rgba(0,0,0,.14); overflow:hidden}
+    html[data-theme="light"] .mock{background:rgba(255,255,255,.65)}
+    .mockHeader{padding:10px 12px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--stroke); color:var(--muted); font-weight:700; font-size:13px}
+    .mockBody{padding:12px}
+    table{width:100%; border-collapse:collapse; font-size:13px}
+    td,th{padding:8px 8px; border-bottom:1px solid var(--stroke); color:var(--muted)}
+    th{color:var(--text); text-align:left}
+    .bar{height:10px; border-radius:99px; background:var(--stroke); overflow:hidden}
+    .bar>i{display:block; height:100%; width:62%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px}
+
+    /* Footer */
+    footer{padding:36px 0 48px; color:var(--muted2)}
+    .small{font-size:12px; color:var(--muted2)}
+
+    /* Scroll reveal */
+    .reveal{opacity:0; transform:translateY(14px); transition:opacity var(--fadeDur) ease, transform var(--fadeDur) ease}
+    .reveal.on{opacity:1; transform:none}
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion:reduce){
+      *{animation:none !important; transition:none !important; scroll-behavior:auto !important}
+    }
+  </style>
 </head>
 
 <body>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="wrap headRow">
+      <a class="brand" href="#top" aria-label="Back to top">
+        <span class="logoBox"><img src="assets/images/logo.png" alt="Alexis logo" /></span>
+        <span class="brandTxt">
+          <b>Alexis Data Systems</b>
+          <span>Excel & Google Sheets Automation</span>
+        </span>
+      </a>
 
-<header>
-  <div class="wrap header-inner">
-    <a class="brand" href="#">
-      <img src="assets/images/logo.png" alt="Alexis Data Systems logo">
-      <div class="brandText">
-        <b>Alexis Data Systems</b>
-        <span>Excel & Google Sheets Automation</span>
-      </div>
-    </a>
+      <nav class="nav" aria-label="Primary">
+        <a href="#about" data-nav="about">About</a>
+        <a href="#services" data-nav="services">Services</a>
+        <a href="#cases" data-nav="cases">Cases</a>
+        <a href="#demo" data-nav="demo">Demo</a>
+        <a href="#contact" data-nav="contact">Contact</a>
+      </nav>
 
-    <nav>
-      <a href="#about">About</a>
-      <a href="#services">Services</a>
-      <a href="#cases">Cases</a>
-      <a href="#contact">Contact</a>
-    </nav>
+      <div class="hdrRight">
+        <div class="avatarCard" title="Hover to expand">
+          <div class="avatar">
+            <img src="assets/images/avatar.jpg" alt="Olexandr portrait" />
+          </div>
+          <div class="ameta">
+            <b>Olexandr</b>
+            <span>Dashboards • Automation • Tracking</span>
+          </div>
+        </div>
 
-    <div class="hdrRight">
-      <div class="avatarWrap">
-        <img src="assets/images/avatar/alexis.jpg" alt="Olexandr">
-      </div>
-      <a class="cta" href="#contact">Hire on Fiverr</a>
-    </div>
-  </div>
-</header>
+        <button class="iconBtn" id="themeBtn" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
 
-<section class="hero">
-  <div class="wrap heroGrid">
-    <div>
-      <h1>From spreadsheet chaos to clear systems.</h1>
-      <p class="lead">
-        Я створюю бізнес-системи на Excel та Google Sheets:
-        дашборди, автоматизацію, контроль та прозору логіку.
-      </p>
-      <div class="btns">
-        <a class="cta" href="#contact">Start a project</a>
-        <a class="btn" href="#cases">View cases</a>
+        <a class="cta" href="#contact">
+          <span class="ripple" aria-hidden="true"></span>
+          Hire on Fiverr
+        </a>
       </div>
     </div>
+  </header>
 
-    <div class="carousel" id="carousel">
-      <div class="track">
-        <div class="slide">
-          <span class="tag">Finance dashboard</span>
-          <img src="assets/images/case-1-dashboard.png">
+  <div id="top"></div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap heroGrid">
+      <div class="panel heroL reveal">
+        <div class="pill">Systems, not spreadsheets • Excel & Automation</div>
+        <h1>Clean business systems built on Excel & Google Sheets.</h1>
+        <p class="lead">Я перетворюю хаотичні таблиці на структуровані системи: дашборди, автоматизація, облік і форми — без зайвого “ручняка”, помилок і плутанини.</p>
+
+        <div class="badges">
+          <div class="badge"><span class="tick">✓</span> No more manual reports</div>
+          <div class="badge"><span class="tick">✓</span> No more spreadsheet chaos</div>
+          <div class="badge"><span class="tick">✓</span> No more costly mistakes</div>
         </div>
-        <div class="slide">
-          <span class="tag">HR onboarding</span>
-          <img src="assets/images/case-2-form.png">
+
+        <div class="heroBtns">
+          <button class="cta" data-ripple>Get your system built</button>
+          <a class="btn" href="#cases" data-ripple>See cases</a>
+          <a class="btn" href="mailto:mr.schljakhta@gmail.com?subject=Project%20Request%20(Alexis%20Data%20Systems)" data-ripple>Email me</a>
         </div>
-        <div class="slide">
-          <span class="tag">Expense tracker</span>
-          <img src="assets/images/case-3-tracker.png">
+
+        <div class="stats">
+          <div class="stat"><b>20+ yrs</b><span>Excel learning & modeling</span></div>
+          <div class="stat"><b>Automation</b><span>VBA + structured workflows</span></div>
+          <div class="stat"><b>Control</b><span>Reliable dashboards & tracking</span></div>
         </div>
-        <div class="slide">
-          <span class="tag">Sheets KPI</span>
-          <img src="assets/images/case-4-gsheets.png">
+      </div>
+
+      <div class="panel heroR reveal">
+        <div class="preview">
+          <div class="pTop">
+            <div class="miniDots" aria-hidden="true"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="small">Showcase previews</div>
+          </div>
+
+          <!-- CAROUSEL -->
+          <div class="carousel">
+            <div class="track" id="track" tabindex="0" aria-label="Cases carousel">
+              <div class="slide"><span class="tag">Finance dashboard</span>
+                <img src="assets/images/case-1-dashboard.png" alt="Finance dashboard preview" onerror="this.remove(); this.parentNode.append('Add case-1-dashboard.png')" />
+              </div>
+              <div class="slide"><span class="tag">HR onboarding</span>
+                <img src="assets/images/case-2-form.png" alt="HR form preview" onerror="this.remove(); this.parentNode.append('Add case-2-form.png')" />
+              </div>
+              <div class="slide"><span class="tag">Expense tracker</span>
+                <img src="assets/images/case-3-tracker.png" alt="Expense tracker preview" onerror="this.remove(); this.parentNode.append('Add case-3-tracker.png')" />
+              </div>
+              <div class="slide"><span class="tag">Sheets KPI system</span>
+                <img src="assets/images/case-4-gsheets.png" alt="Google Sheets KPI preview" onerror="this.remove(); this.parentNode.append('Add case-4-gsheets.png')" />
+              </div>
+            </div>
+
+            <div class="ctrl" aria-hidden="true">
+              <button class="prev" type="button" aria-label="Previous slide">‹</button>
+              <button class="next" type="button" aria-label="Next slide">›</button>
+            </div>
+            <div class="dots" id="dots" role="tablist" aria-label="Carousel pagination"></div>
+          </div>
+        </div>
+        <div class="small" style="padding:10px 8px 0; opacity:.9">
+          Tip: завантаж скріни в <code>assets/images/</code> як <code>case-1-dashboard.png</code>… — і вітрина одразу оживе.
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="about">
-  <div class="wrap">
-    <h2>About</h2>
-    <p class="lead">Я працюю не з таблицями — я працюю з процесами.</p>
-  </div>
-</section>
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="wrap">
+      <div class="secTitle"><div><h2>About</h2><p>Моя спеціалізація — робити з таблиць <b>системи</b>: зрозумілі, підтримувані, масштабовані.</p></div></div>
+      <div class="grid3">
+        <div class="card reveal"><div class="ico">🧩</div><h3>System thinking</h3><p>Структура → правила → контроль. Таблиця перестає “ламатися”.</p></div>
+        <div class="card reveal"><div class="ico">⚙️</div><h3>Automation</h3><p>VBA / Apps Script / формули — знімаю рутину і мінімізую помилки.</p></div>
+        <div class="card reveal"><div class="ico">📈</div><h3>Dashboards</h3><p>Показники, фільтри, візуалізації — керування, а не “звіт заради звіту”.</p></div>
+      </div>
+    </div>
+  </section>
 
-<section id="services">
-  <div class="wrap grid">
-    <div class="card"><h3>Finance dashboards</h3><p>Cashflow, план-факт, контроль.</p></div>
-    <div class="card"><h3>HR systems</h3><p>Форми, база, автоматизація.</p></div>
-    <div class="card"><h3>Automation</h3><p>VBA / Apps Script.</p></div>
-  </div>
-</section>
+  <!-- SERVICES -->
+  <section class="section" id="services">
+    <div class="wrap">
+      <div class="secTitle"><div><h2>Services</h2><p>Найчастіші запити, які я закриваю “під ключ”.</p></div></div>
+      <div class="grid3">
+        <div class="card reveal"><div class="ico">💸</div><h3>Finance dashboard (cashflow)</h3><p>Надходження/витрати, план-факт, зрізи, експорти.</p></div>
+        <div class="card reveal"><div class="ico">👥</div><h3>HR onboarding form</h3><p>Форма + база + валідації + документи/листи.</p></div>
+        <div class="card reveal"><div class="ico">🧾</div><h3>Business expense tracker</h3><p>Категорії, ліміти, аналітика, контроль бюджету.</p></div>
+        <div class="card reveal"><div class="ico">📊</div><h3>Google Sheets KPI system</h3><p>KPI, ролі/доступи, автозвіти, історія змін.</p></div>
+        <div class="card reveal"><div class="ico">🧠</div><h3>Cleanup & refactor</h3><p>Структура, назви, захист, документація.</p></div>
+        <div class="card reveal"><div class="ico">🔒</div><h3>Reliability & control</h3><p>Валідації, логування, помилки — “бойовий режим”.</p></div>
+      </div>
+    </div>
+  </section>
 
-<section id="contact">
-  <div class="wrap">
-    <h2>Contact</h2>
-    <a class="cta" href="mailto:mr.schljakhta@gmail.com">Email me</a>
-  </
+  <!-- CASES -->
+  <section class="section" id="cases">
+    <div class="wrap">
+      <div class="secTitle"><div><h2>Cases</h2><p>Вітрина кейсів (далі додамо one-pager PDF).</p></div></div>
+
+      <div class="cases">
+        <div class="case reveal">
+          <div class="caseTop"><div class="chips"><span class="chip">Finance</span><span class="chip">Dashboard</span><span class="chip">VBA</span></div><span class="small">Case #1</span></div>
+          <h3>Finance dashboard (cashflow)</h3>
+          <p>Від “ручних звітів” до системи: контроль бюджету, категорії, план-факт, швидкі зрізи.</p>
+          <div class="shot"><img src="assets/images/case-1-dashboard.png" alt="Case 1 screenshot" onerror="this.remove(); this.parentNode.append('Add case-1-dashboard.png')" /></div>
+          <div class="caseActions">
+            <a class="linkBtn" href="#demo" data-ripple>▶ Try demo</a>
+            <a class="linkBtn" href="#" onclick="alert('Додамо PDF пізніше: assets/pdfs/case-1-onepager.pdf'); return false;" data-ripple>📄 One-pager</a>
+          </div>
+        </div>
+
+        <div class="case reveal">
+          <div class="caseTop"><div class="chips"><span class="chip">HR</span><span class="chip">Form</span><span class="chip">Automation</span></div><span class="small">Case #2</span></div>
+          <h3>HR onboarding form</h3>
+          <p>Єдина форма збору даних → база → перевірки → готові документи та трекінг статусів.</p>
+          <div class="shot"><img src="assets/images/case-2-form.png" alt="Case 2 screenshot" onerror="this.remove(); this.parentNode.append('Add case-2-form.png')" /></div>
+          <div class="caseActions">
+            <a class="linkBtn" href="mailto:mr.schljakhta@gmail.com?subject=HR%20Onboarding%20System%20Request" data-ripple>✉ Email</a>
+            <a class="linkBtn" href="#" onclick="alert('Додамо PDF пізніше: assets/pdfs/case-2-onepager.pdf'); return false;" data-ripple>📄 One-pager</a>
+          </div>
+        </div>
+
+        <div class="case reveal">
+          <div class="caseTop"><div class="chips"><span class="chip">Expenses</span><span class="chip">Tracking</span><span class="chip">Control</span></div><span class="small">Case #3</span></div>
+          <h3>Business expense tracker</h3>
+          <p>Витрати, ліміти, чеки, аналітика, анти-помилки. Мінімум ручної роботи.</p>
+          <div class="shot"><img src="assets/images/case-3-tracker.png" alt="Case 3 screenshot" onerror="this.remove(); this.parentNode.append('Add case-3-tracker.png')" /></div>
+          <div class="caseActions">
+            <a class="linkBtn" href="#contact" data-ripple>Request similar</a>
+          </div>
+        </div>
+
+        <div class="case reveal">
+          <div class="caseTop"><div class="chips"><span class="chip">Google Sheets</span><span class="chip">KPI</span><span class="chip">Team</span></div><span class="small">Case #4</span></div>
+          <h3>Google Sheets KPI system</h3>
+          <p>KPI, ролі, дашборд команди, автозвіти і контроль якості даних.</p>
+          <div class="shot"><img src="assets/images/case-4-gsheets.png" alt="Case 4 screenshot" onerror="this.remove(); this.parentNode.append('Add case-4-gsheets.png')" /></div>
+          <div class="caseActions">
+            <a class="linkBtn" href="#demo" data-ripple>▶ Try demo</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO (MINI BUILDER) -->
+  <section class="section" id="demo">
+    <div class="wrap">
+      <div class="secTitle"><div><h2>Demo</h2><p>Міні-гра: обери “хаос → система → автоматизація” і подивись результат.</p></div></div>
+
+      <div class="demoGrid">
+        <div class="card reveal">
+          <h3 style="margin:0 0 6px">Build your mini-case</h3>
+          <p style="margin:0; color:var(--muted)">Комбінуй елементи — і я покажу, що саме буде зроблено.</p>
+
+          <div class="selectRow" role="group" aria-label="Demo builder">
+            <div>
+              <label class="small" for="selChaos">Chaos</label>
+              <select id="selChaos">
+                <option value="Manual reports">Manual reports</option>
+                <option value="Spreadsheet mess">Spreadsheet mess</option>
+                <option value="No single source of truth">No single source of truth</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="small" for="selSystem">System</label>
+              <select id="selSystem">
+                <option value="Finance dashboard">Finance dashboard</option>
+                <option value="HR onboarding form">HR onboarding form</option>
+                <option value="Business expense tracker">Business expense tracker</option>
+                <option value="Google Sheets KPI system">Google Sheets KPI system</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="small" for="selAuto">Automation</label>
+              <select id="selAuto">
+                <option value="VBA">VBA</option>
+                <option value="Google Apps Script">Google Apps Script</option>
+                <option value="Smart formulas + validations">Smart formulas + validations</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="heroBtns" style="margin-top:10px">
+            <button class="btn" id="presetBtn" type="button" data-ripple>Use preset</button>
+            <button class="btn" id="randomBtn" type="button" data-ripple>Random</button>
+          </div>
+        </div>
+
+        <div class="result reveal" aria-live="polite">
+          <h3 id="rTitle">Manual reports → Finance dashboard → VBA</h3>
+          <p id="rDesc">Замість ручних звітів: дашборд cashflow з категоріями, план-факт, фільтрами і швидким експортом.</p>
+          <div class="chips" id="rChips"><span class="chip">Less chaos</span><span class="chip">More control</span><span class="chip">Faster decisions</span></div>
+
+          <div class="mock" role="img" aria-label="Mini dashboard mock">
+            <div class="mockHeader"><span id="mockName">Finance dashboard</span><span class="small" id="mockAuto">Automation: VBA</span></div>
+            <div class="mockBody">
+              <table>
+                <thead><tr><th>Metric</th><th>Value</th><th>Trend</th></tr></thead>
+                <tbody>
+                  <tr><td>Revenue</td><td id="mRev">$12,450</td><td><div class="bar"><i style="width:72%"></i></div></td></tr>
+                  <tr><td>Expenses</td><td id="mExp">$7,980</td><td><div class="bar"><i style="width:58%"></i></div></td></tr>
+                  <tr><td>Net</td><td id="mNet">$4,470</td><td><div class="bar"><i style="width:64%"></i></div></td></tr>
+                </tbody>
+              </table>
+              <div class="caseActions" style="margin-top:12px">
+                <a class="linkBtn" href="#contact" data-ripple>Get this built</a>
+                <a class="linkBtn" href="#cases" data-ripple>See similar cases</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="small" style="margin-top:10px">Користувач грається — і розуміє логіку продукту.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <div class="wrap">
+      <div class="secTitle"><div><h2>Contact</h2><p>Напиши коротко: що болить, що є зараз, який результат хочеш. Я відповім з планом і оцінкою.</p></div></div>
+
+      <div class="grid3">
+        <div class="card reveal">
+          <h3 style="margin:0 0 6px">Email</h3>
+          <p style="margin:0; color:var(--muted)">Основний канал. Можна одразу з файлами/скрінами.</p>
+          <div class="heroBtns" style="margin-top:10px">
+            <a class="linkBtn" href="mailto:mr.schljakhta@gmail.com?subject=Project%20Request%20(Alexis%20Data%20Systems)" data-ripple>✉ mr.schljakhta@gmail.com</a>
+            <button class="linkBtn" type="button" onclick="copyText('mr.schljakhta@gmail.com')" data-ripple>📋 Copy</button>
+          </div>
+          <div class="small" style="margin-top:10px">Fiverr: вставимо лінк — кнопка “Hire on Fiverr” підхопить.</div>
+        </div>
+
+        <div class="card reveal">
+          <h3 style="margin:0 0 6px">What to include</h3>
+          <p style="margin:0; color:var(--muted)">1) Ніша/процес • 2) Які таблиці є • 3) Ролі/користувачі • 4) Який результат потрібен.</p>
+          <div class="caseActions" style="margin-top:12px">
+            <a class="cta" href="mailto:mr.schljakhta@gmail.com?subject=Quick%20Brief%20(Alexis%20Data%20Systems)" data-ripple>Send brief</a>
+          </div>
+        </div>
+
+        <div class="card reveal">
+          <h3 style="margin:0 0 6px">Custom domain (опц.)</h3>
+          <p style="margin:0; color:var(--muted)">Можемо підв’язати <code>alexisdatasystems.com</code> у пару кроків.</p>
+          <div class="caseActions" style="margin-top:12px">
+            <a class="linkBtn" href="#top" data-ripple>Back to top</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="wrap"><div class="small">© <span id="y"></span> Alexis Data Systems. Built on GitHub Pages.</div></div></footer>
+
+  <script>
+    // YEAR
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // THEME
+    const root   = document.documentElement;
+    const tBtn   = document.getElementById('themeBtn');
+    const tIcon  = document.getElementById('themeIcon');
+    const setTheme = (t) => { root.setAttribute('data-theme', t); localStorage.setItem('ads_theme', t); tIcon.textContent = t==='dark' ? '🌙' : '☀️' };
+    setTheme(localStorage.getItem('ads_theme') || 'dark');
+    tBtn.addEventListener('click', () => setTheme(root.getAttribute('data-theme')==='dark' ? 'light' : 'dark'));
+
+    // NAV ACTIVE BY SCROLL
+    const links = [...document.querySelectorAll('.nav a[data-nav]')];
+    const targets = links.map(a => document.getElementById(a.getAttribute('data-nav'))).filter(Boolean);
+    const io = new IntersectionObserver(entries=>{
+      const v = entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+      if(!v) return; const id = v.target.id;
+      links.forEach(a=>a.classList.toggle('active', a.getAttribute('data-nav')===id));
+      history.replaceState(null,'','#'+id);
+    }, {rootMargin:'-45% 0px -50% 0px', threshold:[0.15,0.3,0.5,0.75]});
+    targets.forEach(s=>io.observe(s));
+    window.addEventListener('hashchange', ()=>{
+      const h=(location.hash||'').slice(1); links.forEach(a=>a.classList.toggle('active', a.getAttribute('data-nav')===h));
+    });
+
+    // SCROLL REVEAL
+    const rev = document.querySelectorAll('.reveal');
+    const rio = new IntersectionObserver(es=>{
+      es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('on'); rio.unobserve(e.target) } });
+    }, {threshold:.12});
+    rev.forEach(el=>rio.observe(el));
+
+    // RIPPLE (for elements with [data-ripple] and .cta/.btn/.linkBtn)
+    const makeRipple = (e)=>{
+      const host = e.currentTarget.querySelector('.ripple') || e.currentTarget.appendChild(Object.assign(document.createElement('span'),{className:'ripple'}));
+      const i = document.createElement('i'); const r = e.currentTarget.getBoundingClientRect();
+      i.style.left = (e.clientX - r.left) + 'px'; i.style.top = (e.clientY - r.top) + 'px';
+      host.appendChild(i); setTimeout(()=>i.remove(), 700);
+    };
+    document.querySelectorAll('[data-ripple], .cta, .btn, .linkBtn').forEach(el=>{
+      el.addEventListener('click', makeRipple, {passive:true});
+    });
+
+    // CAROUSEL
+    const track = document.getElementById('track');
+    const dots  = document.getElementById('dots');
+    const prev  = document.querySelector('.ctrl .prev');
+    const next  = document.querySelector('.ctrl .next');
+
+    let index = 0, timer, slides;
+    const setupDots = ()=>{
+      dots.innerHTML=''; slides = [...track.children];
+      slides.forEach((_,i)=>{ const b=document.createElement('b'); b.setAttribute('role','tab'); if(i===0)b.classList.add('on'); b.addEventListener('click',()=>go(i)); dots.appendChild(b); });
+    };
+    const go = (i)=>{
+      index = (i+slides.length)%slides.length;
+      // scroll to child
+      const el = slides[index]; el.scrollIntoView({inline:'start', block:'nearest', behavior:'smooth'});
+      [...dots.children].forEach((d,k)=>d.classList.toggle('on', k===index));
+      restart();
+    };
+    const restart = ()=>{
+      clearInterval(timer);
+      timer = setInterval(()=>go(index+1), 3800);
+    };
+    prev.addEventListener('click', ()=>go(index-1));
+    next.addEventListener('click', ()=>go(index+1));
+
+    // Swipe support
+    let sx=0, dx=0;
+    const onDown = (e)=>{ sx = ('touches' in e)? e.touches[0].clientX : e.clientX; dx=0 };
+    const onMove = (e)=>{ const x=('touches' in e)? e.touches[0].clientX : e.clientX; dx = x - sx };
+    const onUp   = ()=>{ if(Math.abs(dx)>40){ go(index + (dx<0?1:-1)) } dx=0 };
+    track.addEventListener('mousedown', onDown); track.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
+    track.addEventListener('touchstart', onDown, {passive:true}); track.addEventListener('touchmove', onMove, {passive:true}); track.addEventListener('touchend', onUp);
+
+    setupDots(); restart();
+
+    // DEMO BUILDER
+    const selChaos = document.getElementById('selChaos');
+    const selSystem = document.getElementById('selSystem');
+    const selAuto = document.getElementById('selAuto');
+    const rTitle = document.getElementById('rTitle');
+    const rDesc  = document.getElementById('rDesc');
+    const rChips = document.getElementById('rChips');
+    const mockName = document.getElementById('mockName');
+    const mockAuto = document.getElementById('mockAuto');
+
+    const descMap = {
+      "Finance dashboard":"Дашборд cashflow з категоріями, план-факт, фільтрами і швидким експортом.",
+      "HR onboarding form":"Форма + база + валідатори + статуси + автоматичні документи/листи.",
+      "Business expense tracker":"Облік витрат, ліміти, чеки, категорії, аналітика і контроль помилок.",
+      "Google Sheets KPI system":"KPI, дашборд команди, ролі/доступи, історія змін, автозвіти."
+    };
+    const autoMap = {
+      "VBA":"Кнопки/макроси, валідації, автозаповнення, експорт, захист.",
+      "Google Apps Script":"Тригери, автозвіти, нотифікації, інтеграції.",
+      "Smart formulas + validations":"Сильна логіка на формулах, перевірки, контроль вводу."
+    };
+    function build(){
+      const c=selChaos.value, s=selSystem.value, a=selAuto.value;
+      rTitle.textContent = `${c} → ${s} → ${a}`;
+      rDesc.textContent  = `Замість “${c}”: ${descMap[s]} Автоматизація: ${autoMap[a]}`;
+      mockName.textContent = s; mockAuto.textContent = `Automation: ${a}`;
+      const chips = [
+        c.includes('Manual') ? '1-click reporting' : 'Less chaos',
+        s.includes('dashboard') ? 'Visual control' : 'Structured flow',
+        a==='VBA' ? 'Fast in Excel' : (a.includes('Script') ? 'Cloud automation' : 'No-code logic')
+      ];
+      rChips.innerHTML = chips.map(x=>`<span class="chip">${x}</span>`).join('');
+      // random numbers for “alive” feeling
+      const rev = 11000 + Math.floor(Math.random()*4000);
+      const exp = 6500  + Math.floor(Math.random()*2500);
+      const net = rev - exp;
+      document.getElementById('mRev').textContent = `$${rev.toLocaleString()}`;
+      document.getElementById('mExp').textContent = `$${exp.toLocaleString()}`;
+      document.getElementById('mNet').textContent = `$${net.toLocaleString()}`;
+    }
+    [selChaos, selSystem, selAuto].forEach(e=>e.addEventListener('change', build));
+    document.getElementById('presetBtn').addEventListener('click', ()=>{ selChaos.value='Manual reports'; selSystem.value='Finance dashboard'; selAuto.value='VBA'; build() });
+    document.getElementById('randomBtn').addEventListener('click', ()=>{
+      const pick = sel => sel.options[Math.floor(Math.random()*sel.options.length)].value;
+      selChaos.value = pick(selChaos); selSystem.value = pick(selSystem); selAuto.value = pick(selAuto); build();
+    });
+    build();
+
+    // Helpers
+    function copyText(t){ navigator.clipboard.writeText(t).then(()=>alert('Copied: '+t)) }
+    window.copyText = copyText;
+  </script>
+</body>
+</html>
